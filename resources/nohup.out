@@ -1,0 +1,12 @@
+Fri Mar 27 2015 16:29:55 GMT+0000 (UTC) { '0': 'Server is listening at port 8000' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Successfull query: select date_of_last_request from sprinkler.log_requests_certs_per_udid where udid = \'SPK2sw_83e39fc8-22f4-4480-bd41-5e\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Successfull insert query: insert into sprinkler.log_requests_certs_per_udid(udid, date_of_last_request , mac) VALUES(\'SPK2sw_83e39fc8-22f4-4480-bd41-5e\',\'2015-03-27 16:31:18\',\'18:C8:E7:81:A2:AA\');' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Successfull query: select date_of_last_request from sprinkler.log_requests_certs_per_ip where ip = \'::ffff:86.124.86.85\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Succ query: select (number_of_requests) as reqNumber from sprinkler.log_requests_certs_per_udid where udid = \'SPK2sw_83e39fc8-22f4-4480-bd41-5e\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Succ query: select (number_of_requests) as reqNumber from sprinkler.log_requests_certs_per_ip where ip = \'::ffff:86.124.86.85\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Successfull query: select number_of_requests, date_of_last_request from sprinkler.total_requests_certs; ' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Succesfull update query update sprinkler.log_requests_certs_per_ip set  number_of_requests = \'10\', date_of_last_request = null where ip = \'::ffff:86.124.86.85\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Succesfull update query update sprinkler.log_requests_certs_per_udid set  number_of_requests = \'1\', date_of_last_request = null where udid = \'SPK2sw_83e39fc8-22f4-4480-bd41-5e\'' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Succesfull update query update sprinkler.total_requests_certs set  number_of_requests = \'2\', date_of_last_request = null ' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Inserted to request certs logs table: insert into sprinkler_request_certs(hardware_id, enabled, number_of_requests) VALUES(\'SPK2sw_83e39fc8-22f4-4480-bd41-5e\', 0, 1);' }
+Fri Mar 27 2015 16:31:18 GMT+0000 (UTC) { '0': 'Added sprinkler to WhiteList: insert into auth_code_whitelist(SprinklerId, mac, UDID) values( \'l2ym0qi\',\'18:C8:E7:81:A2:AA\',\'SPK2sw_83e39fc8-22f4-4480-bd41-5e\');' }
