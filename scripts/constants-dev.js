@@ -1,5 +1,5 @@
 module.exports = {
-    DATABASE_HOST: '172.31.1.118',
+    DATABASE_HOST: '172.31.34.176',
     DATABASE_USER: 'root',
     DATABASE_PASSWORD: '',
     DATABASE_NAME: 'sprinkler',
