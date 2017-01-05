@@ -72,12 +72,12 @@ function initConstants() {
 
 function createDefaultCsvIfNotExists() {
 
-  fs.readFile('./resources/sprinklers.csv', 'utf8', function (err,data) {
+  fs.readFile(__dirname+ '/resources/sprinklers.csv', 'utf8', function (err,data) {
 
     if(err && err.code == 'ENOENT') {
 
       // if csv doesn't exists create it with a default header
-      writeRecordToCsv = csv.createCsvFileWriter('./resources/sprinklers.csv', {'flags': 'a'});
+      writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
 
       var csvData = new Array();
       csvData.push('sprinklerId');
@@ -205,7 +205,7 @@ function updateNumberOfRequestsForThisSprinkler(mysql_connection, myUdid,
 
 function writeDataToCsv(mySprinklerId, myMac, myUdid) {
   if(typeof(process.argv[2]) != "undefined" && process.argv[2] == "csv") {
-    writeRecordToCsv = csv.createCsvFileWriter('./resources/sprinklers.csv', {'flags': 'a'});
+    writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
     var csvData = new Array();
     csvData.push(mySprinklerId);
     csvData.push(myMac);

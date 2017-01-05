@@ -39,23 +39,14 @@ plan.local(function(local) {
 
 // run commands on remote hosts (destinations)
 plan.remote(function(remote) {
-    var env = plan.runtime.target;
-
-    // if the chosen target is either finder1 OR finder2
-    // for individual deployment to finder1 OR finder 2
-    if(env != 'production' && env != 'development'){
-        env = 'production';
-    }
-
-    remote.log('Node env set to ' + env);
     remote.log('Move folder to root');
     remote.sudo('cp -R /tmp/' + tmpDir + ' ~', {user: username});
     remote.sudo('rm -rf /tmp/' + tmpDir, {user: username});
 
     remote.log('Install dependencies');
-    remote.sudo('npm --production --prefix ~/' + tmpDir + '/lib install ~/' + tmpDir+'/lib', {user: username});
+    remote.sudo('npm --production --prefix ~/' + tmpDir + ' install ~/' + tmpDir, {user: username});
 
     remote.log('Reload application');
     remote.sudo('ln -snf ~/' + tmpDir + ' ~/'+appName, {user: username});
-    remote.sudo('/etc/init.d/node-proxy restart', {failsafe: true});
+    remote.sudo('/etc/init.d/node restart', {failsafe: true});
 });
