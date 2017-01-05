@@ -9,9 +9,9 @@ var tmpDir = appName+'-' + new Date().getTime();
 // configuration
 plan.target('development', [
     {
-        host: '54.77.100.123',
+        host: '52.51.103.141',
         username: username,
-        privateKey: '/home/radu/.ssh/dev_rsa',
+        privateKey: '/home/radu/.ssh/prod_rsa',
         agent: process.env.SSH_AUTH_SOCK
     }
 ]);

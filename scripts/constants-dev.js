@@ -9,7 +9,7 @@ module.exports = {
     DATABASE_CONN_LIMIT: '10',
     SERVER_PORT: 8000,
     
-    serverCertsAddress: '54.77.100.123',
+    serverCertsAddress: '52.51.103.141',
     
     MAX_NUMBER_OF_REQ_PER_UDID: 1000000,
     MAX_NUMBER_OF_REQ_PER_IP: 1000000,
