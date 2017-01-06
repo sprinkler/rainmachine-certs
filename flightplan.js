@@ -48,5 +48,6 @@ plan.remote(function(remote) {
 
     remote.log('Reload application');
     remote.sudo('ln -snf ~/' + tmpDir + ' ~/'+appName, {user: username});
-    remote.sudo('/etc/init.d/node restart', {failsafe: true});
+    remote.sudo('/etc/init.d/node stop', {failsafe: true});
+    remote.sudo('/etc/init.d/node start', {failsafe: true});
 });

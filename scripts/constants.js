@@ -16,8 +16,8 @@ if(process.env.NODE_ENV == 'development'){
 
 
 let options = {
-    key: fs.readFileSync(path.join(__dirname, '../resources/intermCA/factory.rainmachine.com/interm_rsa_2048.key'), 'utf8'),
-    cert: fs.readFileSync(path.join(__dirname, '../resources/intermCA/factory.rainmachine.com/interm_sign_cert.pem'), 'utf8')
+    key: fs.readFileSync('/home/ec2-user/resources/intermCA/factory.rainmachine.com/interm_rsa_2048.key', 'utf8'),
+    cert: fs.readFileSync('/home/ec2-user/resources/intermCA/factory.rainmachine.com/interm_sign_cert.pem', 'utf8')
 };
 config.certs = options;
 

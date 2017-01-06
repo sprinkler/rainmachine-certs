@@ -72,12 +72,12 @@ function initConstants() {
 
 function createDefaultCsvIfNotExists() {
 
-  fs.readFile(__dirname+ '/resources/sprinklers.csv', 'utf8', function (err,data) {
+  fs.readFile('/home/ec2-user/resources/sprinklers.csv', 'utf8', function (err,data) {
 
     if(err && err.code == 'ENOENT') {
 
       // if csv doesn't exists create it with a default header
-      writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
+      writeRecordToCsv = csv.createCsvFileWriter('/home/ec2-user/resources/sprinklers.csv', {'flags': 'a'});
 
       var csvData = new Array();
       csvData.push('sprinklerId');
@@ -205,7 +205,7 @@ function updateNumberOfRequestsForThisSprinkler(mysql_connection, myUdid,
 
 function writeDataToCsv(mySprinklerId, myMac, myUdid) {
   if(typeof(process.argv[2]) != "undefined" && process.argv[2] == "csv") {
-    writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
+    writeRecordToCsv = csv.createCsvFileWriter('/home/ec2-user/resources/sprinklers.csv', {'flags': 'a'});
     var csvData = new Array();
     csvData.push(mySprinklerId);
     csvData.push(myMac);
@@ -389,7 +389,7 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
   makeid(function(valueOfSprinklerId) {
     mySprinklerId = valueOfSprinklerId;
 
-    var myExecCommand = __dirname+'/resources/genCloudClientCert.sh "' +
+    var myExecCommand = '/home/ec2-user/resources/genCloudClientCert.sh "' +
       myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '"';
 
     var folderName = myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '';
@@ -432,7 +432,7 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
 
 /* generate a random id with 8 characters for every sprinkler */
 function makeid(callback) {
-  fs.readFile(__dirname+'/resources/sprinklerIDPrefix.txt', function (err,data) {
+  fs.readFile('/home/ec2-user/resources/sprinklerIDPrefix.txt', function (err,data) {
     if(err){
       log.error({msg: 'Unable to read sprinklerIDPrefix file', server: serverCertsAddress});
       //throw err;
@@ -594,12 +594,12 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
   child_gen = exec(myExecCommand, {maxBuffer: 1024 * 16000}, function (error, stdout, stderr) {
 
     if(error) {
-      log.error({msg: JSON.stringify(error), server: serverCertsAddress});
+      log.error({msg: error, server: serverCertsAddress});
       //return;
     }
 
     // read certificate after we execute the script
-    fs.readFile(__dirname+'/resources/cloud-client/'+folderName+'/cloud-client_cert.pem', 'ascii', function (err,data) {
+    fs.readFile('/home/ec2-user/resources/cloud-client/'+folderName+'/cloud-client_cert.pem', 'ascii', function (err,data) {
       var certData;
       if(err) {
         log.error({msg: JSON.stringify(err), server: serverCertsAddress});
@@ -611,7 +611,7 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
 
 
       // read key
-      fs.readFile(__dirname+'/resources/cloud-client/'+folderName+'/rsa_2048.key', 'ascii', function (err,data) {
+      fs.readFile('/home/ec2-user/resources/cloud-client/'+folderName+'/rsa_2048.key', 'ascii', function (err,data) {
         var key;
         if(err) {
           log.error({msg: JSON.stringify(err), server: serverCertsAddress});
