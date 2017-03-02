@@ -1,5 +1,5 @@
 module.exports = {
-    DATABASE_HOST: 'redis.dtohyn.0001.usw2.cache.amazonaws.com',
+    DATABASE_HOST: 'mysql.ctwwni0bhxey.us-west-2.rds.amazonaws.com',
     DATABASE_USER: 'sprinkler',
     DATABASE_PASSWORD: 'password123sprinkler',
     DATABASE_NAME: 'sprinkler',
