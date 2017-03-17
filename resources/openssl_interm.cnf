@@ -1,4 +1,4 @@
-DIRNAME=/home/ec2-user/resources
+DIRNAME=/home/dragos/rainmachine-certs/resources
 
 [ ca ]
 default_ca	= CA_default		# The default ca section

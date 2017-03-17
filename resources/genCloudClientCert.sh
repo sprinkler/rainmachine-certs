@@ -1,6 +1,6 @@
 #!/bin/bash
 CLOUD_CLIENT_NAME=$1
-DIRNAME=/home/ec2-user/resources
+DIRNAME=/home/dragos/rainmachine-certs/resources
 mkdir -p $DIRNAME/cloud-client/$CLOUD_CLIENT_NAME
 
 LOCKDIR=$DIRNAME/certreq.lock
