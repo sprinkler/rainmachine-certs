@@ -602,7 +602,7 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
   if(child_gen_sync) {
 
     // read certificate after we execute the script
-    fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/cloud-client_cert.pem', 'ascii', function (err, data) {
+    fs.readFile(__dirname + '/resources/cloud-client/' + folderName + '/cloud-client_cert.pem', 'ascii', function (err, data) {
       var certData;
       if (err) {
         log.error({msg: JSON.stringify(err), server: serverCertsAddress});
@@ -614,7 +614,7 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
 
 
       // read key
-      fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/rsa_2048.key', 'ascii', function (err, data) {
+      fs.readFile(__dirname + '/resources/cloud-client/' + folderName + '/rsa_2048.key', 'ascii', function (err, data) {
         var key;
         if (err) {
           log.error({msg: JSON.stringify(err), server: serverCertsAddress});
