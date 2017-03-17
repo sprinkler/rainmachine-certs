@@ -1,6 +1,6 @@
 #!/bin/bash
 CLOUD_CLIENT_NAME=$1
-DIRNAME=/home/ec2-user/rainmachine-certs/resources
+DIRNAME=/home/ec2-user/resources
 mkdir -p $DIRNAME/cloud-client/$CLOUD_CLIENT_NAME
 
 LOCKDIR=$DIRNAME/certreq.lock
@@ -23,6 +23,18 @@ echo "***********************************************************"
 
 # Get lock on CA
 echo "Locking CA"
+while [ 1 ]
+do
+mkdir -p "$LOCKDIR"
+if [ $? -ne 0 ] ; then
+    sleep 1
+else
+    break
+fi
+done
+
+
+
 while [ ! mkdir $LOCKDIR &>/dev/null ]; do sleep 1; done
 trap 'rm -rf "${LOCKDIR}"' 0
 trap 'exit 1' 1 2 3 15

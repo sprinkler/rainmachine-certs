@@ -1,4 +1,4 @@
-DIRNAME=/home/ec2-user/rainmachine-proxy/server_certs
+DIRNAME=/home/ec2-user/resources
 
 [ ca ]
 default_ca	= CA_default		# The default ca section

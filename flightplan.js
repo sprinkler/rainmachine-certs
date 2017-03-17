@@ -11,7 +11,7 @@ plan.target('development', [
     {
         host: '52.51.103.141',
         username: username,
-        privateKey: '/home/radu/.ssh/prod_rsa',
+        privateKey: '/home/ciprians/.ssh/dev_rsa',
         agent: process.env.SSH_AUTH_SOCK
     }
 ]);
