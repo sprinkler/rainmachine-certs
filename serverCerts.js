@@ -391,7 +391,7 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
   makeid(function(valueOfSprinklerId) {
     mySprinklerId = valueOfSprinklerId;
 
-    var myExecCommand = __dirname+'/../resources/genCloudClientCert.sh "' +
+    var myExecCommand = __dirname+'/resources/genCloudClientCert.sh "' +
       myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '"';
 
     var folderName = myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '';
