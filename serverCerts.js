@@ -73,7 +73,7 @@ function initConstants() {
 
 function createDefaultCsvIfNotExists() {
 
-  fs.readFile(__dirname+ '/resources/sprinklers.csv', 'utf8', function (err,data) {
+  fs.readFile(__dirname+ '/../resources/sprinklers.csv', 'utf8', function (err,data) {
 
     if(err && err.code == 'ENOENT') {
 
