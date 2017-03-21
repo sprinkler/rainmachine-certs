@@ -78,7 +78,7 @@ function createDefaultCsvIfNotExists() {
     if(err && err.code == 'ENOENT') {
 
       // if csv doesn't exists create it with a default header
-      writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
+      writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/../resources/sprinklers.csv', {'flags': 'a'});
 
       var csvData = new Array();
       csvData.push('sprinklerId');
@@ -206,7 +206,7 @@ function updateNumberOfRequestsForThisSprinkler(mysql_connection, myUdid,
 
 function writeDataToCsv(mySprinklerId, myMac, myUdid) {
   if(typeof(process.argv[2]) != "undefined" && process.argv[2] == "csv") {
-    writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/resources/sprinklers.csv', {'flags': 'a'});
+    writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/../resources/sprinklers.csv', {'flags': 'a'});
     var csvData = new Array();
     csvData.push(mySprinklerId);
     csvData.push(myMac);
@@ -436,7 +436,7 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
 
 /* generate a random id with 8 characters for every sprinkler */
 function makeid(callback) {
-  fs.readFile(__dirname+'/resources/sprinklerIDPrefix.txt', function (err,data) {
+  fs.readFile(__dirname+'/../resources/sprinklerIDPrefix.txt', function (err,data) {
     if(err){
       log.error({msg: 'Unable to read sprinklerIDPrefix file', server: serverCertsAddress});
       //throw err;
