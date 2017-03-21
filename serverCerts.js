@@ -603,7 +603,6 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
 
     // read certificate after we execute the script
     fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/cloud-client_cert.pem', 'ascii', function (err, data) {
-
       var certData;
       if (err) {
         log.error({msg: JSON.stringify(err), server: serverCertsAddress});
