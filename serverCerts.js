@@ -7,6 +7,7 @@ var execSync = require('child_process').execSync;
 var fs = require('fs');
 var parse = require('url').parse;
 var querystring = require('querystring');
+var request = require('request');
 
 var logger = require('./lib/proxy/loggerWrapper.js');
 var log = logger.generalLogger;
@@ -41,6 +42,8 @@ var numberOfRequestsPerSecond = 0;
 
 var serverCertsAddress = constant.serverCertsAddress;
 var writeRecordToCsv;
+var uploadInProgress = false;
+var writeInProgress = false;
 
 var connection;
 
@@ -51,6 +54,44 @@ createDefaultCsvIfNotExists();
 
 // create server on https://54.77.65.230:8000
 createServer();
+setCSVUpload();
+
+function setCSVUpload(){
+    uploadCSV();
+    setInterval(uploadCSV, 10 * 60 * 1000);
+}
+
+function uploadCSV(){
+    if (!writeInProgress) {
+        let baseUrl = 'http://@ec2-54-171-175-5.eu-west-1.compute.amazonaws.com';
+        // const baseUrl = 'https://level1support.rainmachine.com';
+        
+        let url = `${baseUrl}/index.php/nagios/importcsv?key=6ZN6h1duUtxI5hnCcpTsb1w6Az0vKq61`;
+        
+        uploadInProgress = true;
+        
+        let formData = {
+            csv_file: fs.createReadStream(__dirname + '/../resources/sprinklers.csv'),
+        };
+        
+        request.post({
+            url: url,
+            formData: formData
+        }, (err, response, body) => {
+            uploadInProgress = false;
+            
+            if (err) {
+                log.error(`Unable to upload the csv - ${err}`);
+            }
+            
+            console.log(body);
+        });
+    } else {
+        console.log(`Write in progress. Waiting to upload`);
+        setTimeout(uploadCSV, 100);
+    }
+    
+}
 
 function initConstants() {
   var config = {
@@ -204,17 +245,33 @@ function updateNumberOfRequestsForThisSprinkler(mysql_connection, myUdid,
   });
 }
 
-function writeDataToCsv(mySprinklerId, myMac, myUdid) {
-  if(typeof(process.argv[2]) != "undefined" && process.argv[2] == "csv") {
-    writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/../resources/sprinklers.csv', {'flags': 'a'});
-    var csvData = new Array();
-    csvData.push(mySprinklerId);
-    csvData.push(myMac);
-    csvData.push(myUdid);
-    writeRecordToCsv.writeRecord(csvData);
-    writeRecordToCsv.writeStream.end();
-    log.info({msg: "Sprinkler with UDID: "+myUdid+" added to csv", server: serverCertsAddress, sprinklerId: mySprinklerId});
+function writeDataToCsv(mySprinklerId, myMac, myUdid, finish) {
+  if (!uploadInProgress) {
+      if(typeof(process.argv[2]) != "undefined" && process.argv[2] == "csv") {
+          writeInProgress = true;
+          writeRecordToCsv = csv.createCsvFileWriter(__dirname+ '/../resources/sprinklers.csv', {'flags': 'a'});
+          
+          writeRecordToCsv.writeStream.on('finish', () => {
+            console.log('finished writing to csv');
+            writeInProgress = false;
+          });
+          
+          var csvData = new Array();
+          csvData.push(mySprinklerId);
+          csvData.push(myMac);
+          csvData.push(myUdid);
+          writeRecordToCsv.writeRecord(csvData);
+          writeRecordToCsv.writeStream.end();
+          
+          log.info({msg: "Sprinkler with UDID: "+myUdid+" added to csv", server: serverCertsAddress, sprinklerId: mySprinklerId});
+      }
+  } else {
+    console.log(`Upload in progress - ${mySprinklerId} waiting to write`);
+    setTimeout(() => {
+      writeDataToCsv(mySprinklerId, myMac, myUdid, finish);
+    }, 100);
   }
+
 }
 
 function getProperty(field, body) {
@@ -414,10 +471,10 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
                           addToWhiteList(mySprinklerId, myMac, myUdid, function (code) {
 
                           // for every sprinkler we need to write it in the csv
-                          writeDataToCsv(mySprinklerId, myMac, myUdid);
-
-                          // return response
-						  returnResponse(response, code, headers, myPostData);
+                          writeDataToCsv(mySprinklerId, myMac, myUdid, () => {
+                              // return response
+                              returnResponse(response, code, headers, myPostData);
+                          });
                         });
                       });
                 });
