@@ -3,6 +3,7 @@ var https = require('https');
 var qs = require('querystring');
 var sys = require('sys');
 var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 var fs = require('fs');
 var parse = require('url').parse;
 var querystring = require('querystring');
@@ -272,6 +273,7 @@ function createServer() {
       // now we have the value of the post params in body variable
       request.on('end', function () {
 
+        //var parsedBody = JSON.parse(body);
         var myMac = getProperty("mac", body);
         var myUdid = getProperty("udid", body);
         var ip = request.connection.remoteAddress;
@@ -389,7 +391,8 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
   makeid(function(valueOfSprinklerId) {
     mySprinklerId = valueOfSprinklerId;
 
-    var myExecCommand = '/home/ec2-user/resources/genCloudClientCert.sh "' +
+    var myExecCommand = __dirname+'/../resources/genCloudClientCert.sh "' +
+
       myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '"';
 
     var folderName = myMac + '=:=' + myUdid + '=:=' + mySprinklerId + '';
@@ -425,7 +428,9 @@ function buildSprinklerCerts(connection, myUdid, myMac, response, headers) {
             response.writeHead(CODE_ERROR, headers);
             response.end();
           }
-      }
+      }else{
+          returnResponse(response, CODE_ERROR, headers, myPostData);
+        }
       });
   });
 }
@@ -567,7 +572,7 @@ function testIdAvalilability( mySprinklerId, callback) {
 
         if(err) {
           log.debug({msg: 'err: '+err, server: serverCertsAddress});
-          log.error({msg: err, server: serverCertsAddress, sprinklerId: sprinklerId});
+          log.error({msg: err, server: serverCertsAddress, sprinklerId: mySprinklerId});
         }
         if(typeof(rows) != 'undefined' && rows.length != 0) {
           retValue = false;
@@ -581,7 +586,7 @@ function testIdAvalilability( mySprinklerId, callback) {
       });
     }
     else {
-      log.error({msg: err, server: serverCertsAddress, sprinklerId: sprinklerId});
+      log.error({msg: err, server: serverCertsAddress, sprinklerId: mySprinklerId});
       if (mysql_connection)
 		mysql_connection.release();
     }
@@ -591,54 +596,130 @@ function testIdAvalilability( mySprinklerId, callback) {
 
 function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId, callback) {
   // execute script
-  child_gen = exec(myExecCommand, {maxBuffer: 1024 * 16000}, function (error, stdout, stderr) {
+  //Try something synchrounous
 
-    if(error) {
-      log.error({msg: error, server: serverCertsAddress});
-      //return;
-    }
+  child_gen_sync = execSync(myExecCommand,{maxBuffer: 1024 * 16000});
+
+  if(child_gen_sync) {
 
     // read certificate after we execute the script
-    fs.readFile('/home/ec2-user/resources/cloud-client/'+folderName+'/cloud-client_cert.pem', 'ascii', function (err,data) {
+    fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/cloud-client_cert.pem', 'ascii', function (err, data) {
       var certData;
-      if(err) {
+      if (err) {
         log.error({msg: JSON.stringify(err), server: serverCertsAddress});
         certData = null;
         //return;
-      }else{
+      } else {
         certData = data;
       }
 
 
       // read key
-      fs.readFile('/home/ec2-user/resources/cloud-client/'+folderName+'/rsa_2048.key', 'ascii', function (err,data) {
+      fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/rsa_2048.key', 'ascii', function (err, data) {
         var key;
-        if(err) {
+        if (err) {
           log.error({msg: JSON.stringify(err), server: serverCertsAddress});
           key = null;
           //return;
-        }else{
+        } else {
           key = data;
         }
-        var emptyJson = {sprinklerId: 0,
-                          key: null,
-                          cert: null
-                      };
+        var emptyJson = {
+          sprinklerId: 0,
+          key: null,
+          cert: null
+        };
         var myPostData = {
           key: key,
           cert: certData,
           sprinklerId: mySprinklerId
         };
-        if(key != null && certData != null) {
+        if (key != null && certData != null && certData && certData != '') {
           log.debug({msg: 'sending back actual data', server: serverCertsAddress});
           callback(myPostData);
         }
-        else{
+        else {
           log.debug({msg: 'sending back emptyJson', server: serverCertsAddress});
           callback(emptyJson);
         }
 
       });
+
     });
-  });
+  }
+
+
+  // child_gen = exec(myExecCommand + ' 2>&1 1>output && echo done! > done', {maxBuffer: 1024 * 16000}, function (error, stdout, stderr) {
+  //
+  //   while (!fs.existsSync('done')) {
+  //     // Do nothing
+  //   }
+  //
+  //   if(error) {
+  //     log.error({msg: JSON.stringify(error), server: serverCertsAddress});
+  //     //return;
+  //   }
+  //
+  //   if(stderr){
+  //     if(stderr.indexOf('ERROR:Serial') > -1){
+  //       //Do something here to regenerate the certificate
+  //       log.error({msg: stderr,server: serverCertsAddress});
+  //     }
+  //   }
+  //
+  //   // read certificate after we execute the script
+  //   fs.readFile(__dirname+'/../resources/cloud-client/'+folderName+'/cloud-client_cert.pem', 'ascii', function (err,data) {
+  //     var certData;
+  //     if(err) {
+  //       log.error({msg: JSON.stringify(err), server: serverCertsAddress});
+  //       certData = null;
+  //       //return;
+  //     }else{
+  //       certData = data;
+  //     }
+  //
+  //
+  //     // read key
+  //     fs.readFile(__dirname+'/../resources/cloud-client/'+folderName+'/rsa_2048.key', 'ascii', function (err,data) {
+  //       var key;
+  //       if(err) {
+  //         log.error({msg: JSON.stringify(err), server: serverCertsAddress});
+  //         key = null;
+  //         //return;
+  //       }else{
+  //         key = data;
+  //       }
+  //       var emptyJson = {sprinklerId: 0,
+  //                         key: null,
+  //                         cert: null
+  //                     };
+  //       var myPostData = {
+  //         key: key,
+  //         cert: certData,
+  //         sprinklerId: mySprinklerId
+  //       };
+  //       if(key != null && certData != null && certData && certData != '' ) {
+  //         log.debug({msg: 'sending back actual data', server: serverCertsAddress});
+  //         callback(myPostData);
+  //       }
+  //       else{
+  //         log.debug({msg: 'sending back emptyJson', server: serverCertsAddress});
+  //         callback(emptyJson);
+  //       }
+  //
+  //     });
+  //   });
+  //
+  //   // Read the output
+  //   if (fs.existsSync('output')) {
+  //     // Do something
+  //     var output = fs.readFileSync('output');
+  //     fs.unlinkSync('output');
+  //   }
+  //
+  //   if (fs.existsSync('done')) {
+  //     fs.unlinkSync('done');
+  //   }
+  //
+  // });
 }
