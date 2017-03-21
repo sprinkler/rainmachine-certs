@@ -615,7 +615,6 @@ function executeScriptAndReturnPostData(myExecCommand, folderName, mySprinklerId
 
       // read key
       fs.readFile(__dirname + '/../resources/cloud-client/' + folderName + '/rsa_2048.key', 'ascii', function (err, data) {
-
         var key;
         if (err) {
           log.error({msg: JSON.stringify(err), server: serverCertsAddress});
