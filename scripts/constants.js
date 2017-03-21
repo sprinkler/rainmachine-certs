@@ -8,7 +8,10 @@ if(process.env.NODE_ENV == 'development'){
   config = require('./constants-dev');
 }else if(process.env.NODE_ENV == 'production'){
   config = require('./constants-live');
-}else{
+}else if(process.env.NODE_ENV == 'factory'){
+    config = require('./constants-factory');
+}
+else{
   console.log('Could not read NODE_ENV');
   process.exit(1);
 }
