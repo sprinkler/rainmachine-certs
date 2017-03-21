@@ -11,7 +11,7 @@ plan.target('development', [
     {
         host: '52.51.103.141',
         username: username,
-        privateKey: '/home/radu/.ssh/dev_rsa',
+        privateKey: '/home/ciprians/.ssh/dev_rsa',
         agent: process.env.SSH_AUTH_SOCK
     }
 ]);
@@ -48,6 +48,5 @@ plan.remote(function(remote) {
 
     remote.log('Reload application');
     remote.sudo('ln -snf ~/' + tmpDir + ' ~/'+appName, {user: username});
-    remote.sudo('/etc/init.d/node stop', {failsafe: true});
-    remote.sudo('/etc/init.d/node start', {failsafe: true});
+    remote.sudo('/etc/init.d/node restart', {failsafe: true});
 });
