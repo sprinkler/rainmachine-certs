@@ -11,7 +11,7 @@ plan.target('development', [
     {
         host: '52.51.103.141',
         username: username,
-        privateKey: '/home/ciprians/.ssh/dev_rsa',
+        privateKey: '/root/.ssh/dev_rsa',
         agent: process.env.SSH_AUTH_SOCK
     }
 ]);
@@ -20,7 +20,7 @@ plan.target('production', [
     {
         host: '52.25.21.163',
         username: username,
-        privateKey: '/home/radu/.ssh/prod_rsa',
+        privateKey: '/root/.ssh/prod_rsa',
         agent: process.env.SSH_AUTH_SOCK
     }
 ]);
