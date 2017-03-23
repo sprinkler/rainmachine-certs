@@ -282,6 +282,8 @@ function writeDataToCsv(mySprinklerId, myMac, myUdid, finish) {
                 server: serverCertsAddress,
                 sprinklerId: mySprinklerId
             });
+
+            return finish();
         }
     } else {
         console.log(`Upload/Clean in progress - ${mySprinklerId} waiting to write`);
