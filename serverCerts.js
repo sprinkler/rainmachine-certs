@@ -374,30 +374,42 @@ function createServer() {
                     }
                 }
             }
-    
+            
             else if (request.method === 'GET' && url === '/limits') {
                 log.info({msg: `GET limits request`, sourceIPAddress: request.connection.remoteAddress});
     
-                return response.end({MAX_NUMBER_OF_REQ_PER_IP: constant.MAX_NUMBER_OF_REQ_PER_IP, MAX_NUMBER_OF_REQ_PER_UDID: constant.MAX_NUMBER_OF_REQ_PER_UDID});
+                return response.end(JSON.stringify({MAX_NUMBER_OF_REQ_PER_IP: constant.MAX_NUMBER_OF_REQ_PER_IP, MAX_NUMBER_OF_REQ_PER_UDID: constant.MAX_NUMBER_OF_REQ_PER_UDID}));
             }
     
             else if (request.method === 'POST' && url === '/limits') {
                 log.info({msg: `POST limits request`, sourceIPAddress: request.connection.remoteAddress});
     
-                body = JSON.parse(body);
-                console.log(body);
+                try {
+                    body = querystring.parse(body);
+                    headers["Content-type"] = "text/plain";
     
-                headers["Content-type"] = "text/plain";
-    
-                fs.writeFile(path.join(__dirname, `../resources/server-limits.json`, JSON.stringify(body)), (err) => {
-                    if (err) {
-                        response.writeHead(500, headers);
-                        response.end('Unable to save the server limits');
-                    } else {
-                        response.writeHead(200, headers);
-                        response.end('Successfully saved the server limits');
+                    // querystring parse does not convert the key values to int
+                    for (let k in body) {
+                        body[k] = parseInt(body[k]);
                     }
-                });
+                    
+                    fs.writeFile(path.join(__dirname, `../resources/server-limits.json`), JSON.stringify(body), (err) => {
+                        if (err) {
+                            console.log(err);
+                            response.writeHead(500, headers);
+                            response.end('Unable to save the server limits');
+                        } else {
+                            response.writeHead(200, headers);
+                            response.end('Successfully saved the server limits');
+                        }
+                    });
+                } catch(e) {
+                    console.log(e);
+    
+                    response.writeHead(500, headers);
+                    response.end('Unable to save the server limits');
+                }
+                
             }
     
             else if (request.method == 'POST' && url == "/getCerts") {
