@@ -65,7 +65,7 @@ function setOrGetTotalNumberOfRequestsAndDateOfLastRequest(databaseConnection, f
           }
 
           else {
-            var currentDate = getCurrentTime();
+            var currentDate = new Date();
 
             // add a new log
             var myInsertQuery = "insert into sprinkler."+tableName+"("+fieldName+", date_of_last_request " +

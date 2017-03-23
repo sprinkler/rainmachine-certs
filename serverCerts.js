@@ -283,6 +283,8 @@ function writeDataToCsv(mySprinklerId, myMac, myUdid, finish) {
                 sprinklerId: mySprinklerId
             });
         }
+        
+        return finish();
     } else {
         console.log(`Upload/Clean in progress - ${mySprinklerId} waiting to write`);
         setTimeout(() => {
@@ -336,19 +338,21 @@ function createServer() {
             response.writeHead(200, headers);
             response.end();
         }
+    
+        var body = '';
+        // collect post params
+        request.on('data', function (data) {
+            body += data;
+        });
+    
+        request.on('end', function () {
+            console.log(body);
+    
+            if (request.method === 'GET' && url === '/clean-csv') {
+                log.info({msg: `Clean csv request`, sourceIPAddress: request.connection.remoteAddress});
         
-        if (request.method === 'GET' && url === '/clean-csv') {
-            log.info({msg: `Clean csv request`, sourceIPAddress: request.connection.remoteAddress});
-            
-            var body = '';
-            // collect post params
-            request.on('data', function (data) {
-                body += data;
-            });
-            
-            request.on('end', function () {
                 headers["Content-type"] = "text/plain";
-                
+        
                 if (!writeInProgress && !uploadInProgress) {
                     cleanInProgress = true;
                     cleanCsv((err) => {
@@ -369,25 +373,40 @@ function createServer() {
                         response.end('Upload in progress');
                     }
                 }
-            });
-        }
-        
-        else if (request.method == 'POST' && url == "/getCerts") {
-            log.debug({
-                msg: 'Request received from ' + request.connection.remoteAddress,
-                server: serverCertsAddress,
-                sourceIPAddress: request.connection.remoteAddress
-            });
-            var body = '';
-            // collect post params
-            request.on('data', function (data) {
-                body += data;
-            });
-            
-            // now we have the value of the post params in body variable
-            request.on('end', function () {
-                
-                //var parsedBody = JSON.parse(body);
+            }
+    
+            else if (request.method === 'GET' && url === '/limits') {
+                log.info({msg: `GET limits request`, sourceIPAddress: request.connection.remoteAddress});
+    
+                return response.end({MAX_NUMBER_OF_REQ_PER_IP: constant.MAX_NUMBER_OF_REQ_PER_IP, MAX_NUMBER_OF_REQ_PER_UDID: constant.MAX_NUMBER_OF_REQ_PER_UDID});
+            }
+    
+            else if (request.method === 'POST' && url === '/limits') {
+                log.info({msg: `POST limits request`, sourceIPAddress: request.connection.remoteAddress});
+    
+                body = JSON.parse(body);
+                console.log(body);
+    
+                headers["Content-type"] = "text/plain";
+    
+                fs.writeFile(path.join(__dirname, `../resources/server-limits.json`, JSON.stringify(body)), (err) => {
+                    if (err) {
+                        response.writeHead(500, headers);
+                        response.end('Unable to save the server limits');
+                    } else {
+                        response.writeHead(200, headers);
+                        response.end('Successfully saved the server limits');
+                    }
+                });
+            }
+    
+            else if (request.method == 'POST' && url == "/getCerts") {
+                log.debug({
+                    msg: 'Request received from ' + request.connection.remoteAddress,
+                    server: serverCertsAddress,
+                    sourceIPAddress: request.connection.remoteAddress
+                });
+    
                 var myMac = getProperty("mac", body);
                 var myUdid = getProperty("udid", body);
                 var ip = request.connection.remoteAddress;
@@ -397,14 +416,14 @@ function createServer() {
                     myMac, response, CODE_ERROR, function (dateOfLastRequestForUdid) {
                         common.setOrGetInfoInAuditTable(mysql, connection, IP_FIELD, IP_AUDIT_REQUESTS_CERTS_TABLE, ip,
                             myMac, response, CODE_ERROR, function (dateOfLastRequestForIp) {
-                                
+                    
                                 // extract the total number of the requests + date of the last request for the  UDID
                                 common.getNumberOfRequestsForInfo(connection, UDID_FIELD, UDID_AUDIT_REQUESTS_CERTS_TABLE, myUdid, response,
                                     CODE_ERROR, function (totalNumberOFRequestsPerUdid) {
-                                        
+                            
                                         common.getNumberOfRequestsForInfo(connection, IP_FIELD, IP_AUDIT_REQUESTS_CERTS_TABLE, ip,
                                             response, CODE_ERROR, function (totalNumberOFRequestsPerIp) {
-                                                
+                                    
                                                 // test if the number of the requests per email or per ip are in the range
                                                 log.info({
                                                     msg: 'Total Number of requests per UDID:' + totalNumberOFRequestsPerUdid + ' /IP:' + totalNumberOFRequestsPerIp,
@@ -418,57 +437,57 @@ function createServer() {
                                                         server: serverCertsAddress,
                                                         sourceIPAddress: ip
                                                     });
-                                                    
+                                        
                                                     // increment the number of requests per ip
                                                     totalNumberOFRequestsPerIp++;
                                                     var myUpdateQuery = common.constructUpdateQuery(mysql, IP_AUDIT_REQUESTS_CERTS_TABLE,
                                                         IP_FIELD, totalNumberOFRequestsPerIp, ip);
                                                     common.updateAuditTable(connection, myUpdateQuery, CODE_ERROR, response);
-                                                    
+                                        
                                                     // increment the number of requests per udid
                                                     totalNumberOFRequestsPerUdid++;
                                                     var myUpdateQuery = common.constructUpdateQuery(mysql, UDID_AUDIT_REQUESTS_CERTS_TABLE,
                                                         UDID_FIELD, totalNumberOFRequestsPerUdid, myUdid);
                                                     common.updateAuditTable(connection, myUpdateQuery, CODE_ERROR, response);
-                                                    
+                                        
                                                     // get total number of requests in the last 24 hours
                                                     common.setOrGetTotalNumberOfRequestsAndDateOfLastRequest(connection, NUMBER_REQ_FIELD, AUDIT_TOTAL_REQUESTS_CERTS_TABLE,
                                                         response, CODE_ERROR, function (numberOfRequests, dateOfLastRequest) {
-                                                            
+                                                
                                                             var myUpdateQuery = "";
                                                             if (numberOfRequests < MAX_NUMBER_OF_REQ_PER_DAY) {
                                                                 numberOfRequests++;
-                                                                
+                                                    
                                                                 myUpdateQuery = common.constructUpdateQuery(mysql, AUDIT_TOTAL_REQUESTS_CERTS_TABLE,
                                                                     null, numberOfRequests);
                                                                 common.updateAuditTable(connection, myUpdateQuery, CODE_ERROR, response);
-                                                                
+                                                    
                                                                 // continue to the usual flow
                                                                 buildSprinklerCerts(connection, myUdid, myMac, response, headers);
                                                             }
-                                                            
+                                                
                                                             // if the number of requests is reached
                                                             else {
-                                                                
+                                                    
                                                                 var currentDate = new Date();
-                                                                
+                                                    
                                                                 // get time diff between current date and date from the last request in minutes
                                                                 var timeDiff = Math.abs((currentDate.getTime() - dateOfLastRequest.getTime()) / INTERVAL);
-                                                                
+                                                    
                                                                 log.debug({
                                                                     msg: "timedif:: " + timeDiff,
                                                                     server: serverCertsAddress,
                                                                     sourceIPAddress: ip
                                                                 });
-                                                                
+                                                    
                                                                 // need to test if the last 24 hours passed
                                                                 if (timeDiff > MAX_MINUTES_INTERVAL) {
-                                                                    
+                                                        
                                                                     // reset to 0 the total number of requests
                                                                     myUpdateQuery = common.constructUpdateQuery(mysql, AUDIT_TOTAL_REQUESTS_CERTS_TABLE,
                                                                         null, 1);
                                                                     common.updateAuditTable(connection, myUpdateQuery, CODE_ERROR, response);
-                                                                    
+                                                        
                                                                     // continue to the usual flow
                                                                     buildSprinklerCerts(connection, myUdid, myMac, response, headers);
                                                                 }
@@ -491,8 +510,9 @@ function createServer() {
                                     });
                             });
                     });
-            });
-        }
+            }
+        });
+        
     }).listen(SERVER_CERTS_PORT);
     log.info({msg: "Server is listening at port " + SERVER_CERTS_PORT, server: serverCertsAddress});
 }
