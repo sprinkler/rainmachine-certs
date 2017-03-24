@@ -378,7 +378,11 @@ function createServer() {
             else if (request.method === 'GET' && url === '/limits') {
                 log.info({msg: `GET limits request`, sourceIPAddress: request.connection.remoteAddress});
     
-                return response.end(JSON.stringify({MAX_NUMBER_OF_REQ_PER_IP: constant.MAX_NUMBER_OF_REQ_PER_IP, MAX_NUMBER_OF_REQ_PER_UDID: constant.MAX_NUMBER_OF_REQ_PER_UDID}));
+                return response.end(JSON.stringify({
+                    MAX_NUMBER_OF_REQ_PER_IP: constant.MAX_NUMBER_OF_REQ_PER_IP,
+                    MAX_NUMBER_OF_REQ_PER_UDID: constant.MAX_NUMBER_OF_REQ_PER_UDID,
+                    MAX_REQUESTS_PER_DAY: constant.MAX_REQUESTS_PER_DAY
+                }));
             }
     
             else if (request.method === 'POST' && url === '/limits') {
@@ -467,7 +471,7 @@ function createServer() {
                                                         response, CODE_ERROR, function (numberOfRequests, dateOfLastRequest) {
                                                 
                                                             var myUpdateQuery = "";
-                                                            if (numberOfRequests < MAX_NUMBER_OF_REQ_PER_DAY) {
+                                                            if (numberOfRequests < constant.MAX_REQUESTS_PER_DAY) {
                                                                 numberOfRequests++;
                                                     
                                                                 myUpdateQuery = common.constructUpdateQuery(mysql, AUDIT_TOTAL_REQUESTS_CERTS_TABLE,

@@ -41,8 +41,13 @@ function readLimits() {
         
         config.MAX_NUMBER_OF_REQ_PER_UDID = limits.MAX_NUMBER_OF_REQ_PER_UDID;
         config.MAX_NUMBER_OF_REQ_PER_IP = limits.MAX_NUMBER_OF_REQ_PER_IP;
+        config.MAX_REQUESTS_PER_DAY = limits.MAX_REQUESTS_PER_DAY;
     } catch(e) {
-        limits = {MAX_NUMBER_OF_REQ_PER_IP: config.MAX_NUMBER_OF_REQ_PER_IP, MAX_NUMBER_OF_REQ_PER_UDID: config.MAX_NUMBER_OF_REQ_PER_UDID};
+        limits = {
+            MAX_NUMBER_OF_REQ_PER_IP: config.MAX_NUMBER_OF_REQ_PER_IP,
+            MAX_NUMBER_OF_REQ_PER_UDID: config.MAX_NUMBER_OF_REQ_PER_UDID,
+            MAX_REQUESTS_PER_DAY: config.MAX_REQUESTS_PER_DAY
+        };
         try {
             fs.writeFileSync(path.join(__dirname, '../../resources/server-limits.json'), JSON.stringify(limits));
         } catch (er) {
