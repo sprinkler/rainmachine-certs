@@ -19,8 +19,8 @@ else{
 
 
 let options = {
-    key: fs.readFileSync('/home/ec2-user/resources/intermCA/factory.rainmachine.com/interm_rsa_2048.key', 'utf8'),
-    cert: fs.readFileSync('/home/ec2-user/resources/intermCA/factory.rainmachine.com/interm_sign_cert.pem', 'utf8')
+    key: fs.readFileSync('/home/dragos/rainmachine-certs/resources/intermCA/factory.rainmachine.com/interm_rsa_2048.key', 'utf8'),
+    cert: fs.readFileSync('/home/dragos/rainmachine-certs/resources/intermCA/factory.rainmachine.com/interm_sign_cert.pem', 'utf8')
 };
 config.certs = options;
 
