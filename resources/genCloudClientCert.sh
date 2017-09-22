@@ -25,7 +25,7 @@ echo "***********************************************************"
 echo "Locking CA"
 while [ 1 ]
 do
-mkdir -p "$LOCKDIR"
+mkdir "$LOCKDIR"
 if [ $? -ne 0 ] ; then
     sleep 1
 else
@@ -35,7 +35,7 @@ done
 
 
 
-while [ ! mkdir $LOCKDIR &>/dev/null ]; do sleep 1; done
+# while [ ! mkdir $LOCKDIR &>/dev/null ]; do sleep 1; done
 trap 'rm -rf "${LOCKDIR}"' 0
 trap 'exit 1' 1 2 3 15
 
